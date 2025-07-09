@@ -27,7 +27,7 @@ apps/autofix-cli/
 │   │   ├── astro-ssr.ts               # Astro SSR handler
 │   │   ├── remix.ts                   # Remix handler
 │   │   └── svelte.ts                  # Svelte handler
-│   ├── utils/
+│   ├── core/
 │   │   ├── project-detection.ts       # Framework detection logic
 │   │   ├── wrangler-config.ts         # Wrangler configuration generation
 │   │   ├── validation.ts              # Configuration validation

@@ -28,8 +28,10 @@ apps/autofix-cli/
 │   │   ├── remix.ts                   # Remix handler
 │   │   ├── svelte-ssg.ts              # Svelte SSG handler
 │   │   └── svelte-ssr.ts              # Svelte SSR handler
+│   ├── detection/
+│   │   ├── project.ts                 # Framework detection logic
+│   │   └── package-manager.ts         # Package manager detection and operations
 │   ├── core/
-│   │   ├── project-detection.ts       # Framework detection logic
 │   │   ├── wrangler-config.ts         # Wrangler configuration generation
 │   │   ├── validation.ts              # Configuration validation
 │   │   └── output.ts                  # Structured output formatting
@@ -59,7 +61,30 @@ npx autofix-cli pages-to-workers --framework <framework> [options]
 
 ## Core Functionality
 
-### 1. Framework Detection and Validation
+### 1. Package Manager Detection
+
+Before making any modifications, the CLI must detect the package manager in use to properly install dependencies and update wrangler.
+
+#### Detection Logic
+1. **Check for lock files** in project root:
+   - `pnpm-lock.yaml` → pnpm
+   - `yarn.lock` → yarn
+   - `package-lock.json` → npm
+   - `bun.lockb` → bun
+
+2. **Fallback to npm** if no lock files found
+
+3. **Validate package manager** is available in system PATH
+
+#### Package Manager Operations
+Once detected, the CLI uses the appropriate commands:
+
+- **pnpm**: `pnpm add wrangler@latest`
+- **yarn**: `yarn add wrangler@latest`
+- **npm**: `npm install wrangler@latest`
+- **bun**: `bun add wrangler@latest`
+
+### 2. Framework Detection and Validation
 
 #### Detection Logic
 
@@ -90,7 +115,7 @@ interface FrameworkDetection {
    - Log warning but continue
    - Include warning in output summary
 
-### 2. Configuration Generation
+### 3. Configuration Generation
 
 #### Wrangler Configuration
 
@@ -120,7 +145,7 @@ interface WranglerConfig {
 2. Check for conflicting existing configurations
 3. Validate required fields are present
 
-### 3. Package.json Updates
+### 4. Package.json Updates
 
 #### Script Modifications
 
@@ -146,14 +171,14 @@ The existing build command (from `--pages-build-command`) can continue to work a
 
 #### Dependency Updates
 
-- Update `wrangler` to latest version
+- Update `wrangler` to latest version using detected package manager
 - Log version changes in output
 
-### 4. Build Validation
+### 5. Build Validation
 
 #### Process
 
-1. Execute `npm run build` (or equivalent build script)
+1. Execute build script using detected package manager (e.g., `pnpm run build`, `yarn build`, `npm run build`)
 2. Capture stdout/stderr
 3. Check exit code
 4. Include results in output summary
@@ -255,10 +280,11 @@ interface MigrationResult {
 ```typescript
 class AstroSSGHandler implements FrameworkHandler {
   async migrate(projectPath: string): Promise<MigrationResult> {
-    // 1. Generate wrangler.jsonc with pages_build_output_dir
-    // 2. Add postbuild script for wrangler pages functions build
-    // 3. Validate configuration against JSON schema
-    // 4. Run build validation and capture results
+    // 1. Detect package manager (pnpm, yarn, npm, bun)
+    // 2. Update wrangler to latest version using detected package manager
+    // 3. Generate wrangler.jsonc with appropriate static site configuration
+    // 4. Validate configuration against JSON schema
+    // 5. Run build validation and capture results
 
     return {
       success: true,
@@ -269,13 +295,8 @@ class AstroSSGHandler implements FrameworkHandler {
             summary: 'Generated Astro SSG configuration with pages_build_output_dir set to "dist"',
           },
         ],
-        files_modified: [
-          {
-            path: 'package.json',
-            summary: 'Added postbuild script: "wrangler pages functions build"',
-          },
-        ],
-        dependencies_updated: ['wrangler@4.x.x'],
+        files_modified: [],
+        dependencies_updated: ['wrangler@4.x.x (using pnpm)'],
       },
       warnings: [],
       validation: { config_valid: true, build_successful: true },

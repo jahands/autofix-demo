@@ -261,6 +261,8 @@ interface MigrationResult {
 }
 ```
 
+**Note**: Implementation should use Zod v4 schemas for runtime validation of these interfaces.
+
 ### Example Implementation
 
 ```typescript

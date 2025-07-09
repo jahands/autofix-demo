@@ -4,6 +4,7 @@ import 'zx/globals'
 
 import { program } from '@commander-js/extra-typings'
 import { catchProcessError } from '@jahands/cli-tools/proc'
+import { createPagesToWorkersCommand } from '../commands/pages-to-workers.cmd.js'
 
 import { version } from '../../package.json'
 
@@ -12,9 +13,14 @@ program
 	.description('A CLI for autofixing issues, such as Cloudflare Workers compatibility issues')
 	.version(version)
 
-	.action(async () => {
-		console.log('Hello, world!')
-	})
+// Add subcommands
+program.addCommand(createPagesToWorkersCommand())
 
+// If no command is provided, show help
+program.action(() => {
+	program.help()
+})
+
+program
 	.parseAsync()
 	.catch(catchProcessError())

@@ -26,7 +26,8 @@ apps/autofix-cli/
 │   │   ├── astro-ssg.ts               # Astro SSG handler
 │   │   ├── astro-ssr.ts               # Astro SSR handler
 │   │   ├── remix.ts                   # Remix handler
-│   │   └── svelte.ts                  # Svelte handler
+│   │   ├── svelte-ssg.ts              # Svelte SSG handler
+│   │   └── svelte-ssr.ts              # Svelte SSR handler
 │   ├── core/
 │   │   ├── project-detection.ts       # Framework detection logic
 │   │   ├── wrangler-config.ts         # Wrangler configuration generation
@@ -44,7 +45,7 @@ npx autofix-cli pages-to-workers --framework <framework> [options]
 
 ### Arguments and Options
 
-- `--framework <framework>`: Required. One of `astro-ssg`, `astro-ssr`, `remix`, `svelte`
+- `--framework <framework>`: Required. One of `astro-ssg`, `astro-ssr`, `remix`, `svelte-ssg`, `svelte-ssr`
 - `--pages-output-dir <dir>`: Optional. Specify Pages output directory when no wrangler config exists
 - `--force`: Optional. Force migration even if multiple frameworks are detected
 - `--dry-run`: Optional. Preview changes without modifying files
@@ -71,10 +72,11 @@ interface FrameworkDetection {
 
 **Detection Rules:**
 
-- **Astro SSG**: `@astrojs/node` NOT in dependencies, `astro` in dependencies
-- **Astro SSR**: `@astrojs/node` in dependencies, `astro` in dependencies
-- **Remix**: `@remix-run/node` or `@remix-run/cloudflare` in dependencies
-- **Svelte**: `@sveltejs/kit` in dependencies, `@sveltejs/adapter-cloudflare` in dependencies
+- **Astro SSG**: `@astrojs/cloudflare` NOT in dependencies, `astro` in dependencies
+- **Astro SSR**: `@astrojs/cloudflare` and `astro` in dependencies
+- **Remix**: Any `@remix-run/` dependency present
+- **Svelte SSG**: `@sveltejs/kit` in dependencies, `@sveltejs/adapter-static` in dependencies
+- **Svelte SSR**: `@sveltejs/kit` in dependencies, `@sveltejs/adapter-cloudflare` in dependencies
 
 #### Validation Process
 
@@ -272,14 +274,27 @@ class RemixHandler implements FrameworkHandler {
 }
 ```
 
-### Svelte Handler
+### Svelte SSG Handler
 
 ```typescript
-class SvelteHandler implements FrameworkHandler {
+class SvelteSSGHandler implements FrameworkHandler {
   async migrate(projectPath: string): Promise<MigrationResult> {
-    // 1. Generate wrangler.jsonc for SvelteKit
+    // 1. Generate wrangler.jsonc with pages_build_output_dir
+    // 2. Add postbuild script for wrangler pages functions build
+    // 3. Set SvelteKit static adapter compatibility flags
+    // 4. Validate configuration
+  }
+}
+```
+
+### Svelte SSR Handler
+
+```typescript
+class SvelteSSRHandler implements FrameworkHandler {
+  async migrate(projectPath: string): Promise<MigrationResult> {
+    // 1. Generate wrangler.jsonc for SvelteKit SSR
     // 2. Update build/deploy scripts
-    // 3. Set SvelteKit-specific compatibility flags
+    // 3. Set SvelteKit Cloudflare adapter compatibility flags
     // 4. Validate configuration
   }
 }

@@ -40,14 +40,11 @@
 	},
 	"devDependencies": {
 		"@commander-js/extra-typings": "14.0.0",
-		"@fast-csv/format": "5.0.2",
 		"@jahands/cli-tools": "0.10.12",
-		"@modelcontextprotocol/sdk": "1.15.0",
 		"@repo/eslint-config": "workspace:*",
 		"@repo/tools": "workspace:*",
 		"@repo/typescript-config": "workspace:*",
 		"commander": "14.0.0",
-		"gray-matter": "4.0.3",
 		"vitest": "3.2.4",
 		"zod": "3.25.76",
 		"zx": "8.6.2"

@@ -235,67 +235,52 @@ Framework-specific script updates:
 
 ## Framework-Specific Implementations
 
-### Astro SSG Handler
+Each framework handler implements the `FrameworkHandler` interface and is responsible for:
+
+1. **Configuration Generation**: Creating appropriate wrangler.jsonc settings for the framework
+2. **Script Updates**: Modifying package.json scripts for build and deployment
+3. **Validation**: Ensuring the generated configuration is valid
+4. **Build Testing**: Running the build process to verify the migration works
+
+### Handler Interface
+
+```typescript
+interface FrameworkHandler {
+  async migrate(projectPath: string): Promise<MigrationResult>
+}
+
+interface MigrationResult {
+  success: boolean
+  changes: {
+    files_created: string[]
+    files_modified: string[]
+    dependencies_updated: string[]
+  }
+  warnings: Warning[]
+  validation: ValidationResult
+}
+```
+
+### Example Implementation
 
 ```typescript
 class AstroSSGHandler implements FrameworkHandler {
   async migrate(projectPath: string): Promise<MigrationResult> {
     // 1. Generate wrangler.jsonc with pages_build_output_dir
     // 2. Add postbuild script for wrangler pages functions build
-    // 3. Validate configuration
-    // 4. Run build validation
-  }
-}
-```
-
-### Astro SSR Handler
-
-```typescript
-class AstroSSRHandler implements FrameworkHandler {
-  async migrate(projectPath: string): Promise<MigrationResult> {
-    // 1. Generate wrangler.jsonc with main entry point
-    // 2. Add deploy script
-    // 3. Set compatibility flags
-    // 4. Validate and test build
-  }
-}
-```
-
-### Remix Handler
-
-```typescript
-class RemixHandler implements FrameworkHandler {
-  async migrate(projectPath: string): Promise<MigrationResult> {
-    // 1. Generate wrangler.jsonc for Remix
-    // 2. Update build/deploy scripts
-    // 3. Set Remix-specific compatibility flags
-    // 4. Validate configuration
-  }
-}
-```
-
-### Svelte SSG Handler
-
-```typescript
-class SvelteSSGHandler implements FrameworkHandler {
-  async migrate(projectPath: string): Promise<MigrationResult> {
-    // 1. Generate wrangler.jsonc with pages_build_output_dir
-    // 2. Add postbuild script for wrangler pages functions build
-    // 3. Set SvelteKit static adapter compatibility flags
-    // 4. Validate configuration
-  }
-}
-```
-
-### Svelte SSR Handler
-
-```typescript
-class SvelteSSRHandler implements FrameworkHandler {
-  async migrate(projectPath: string): Promise<MigrationResult> {
-    // 1. Generate wrangler.jsonc for SvelteKit SSR
-    // 2. Update build/deploy scripts
-    // 3. Set SvelteKit Cloudflare adapter compatibility flags
-    // 4. Validate configuration
+    // 3. Validate configuration against JSON schema
+    // 4. Run build validation and capture results
+    
+    return {
+      success: true,
+      changes: {
+        files_created: ['wrangler.jsonc'],
+        files_modified: ['package.json'],
+        dependencies_updated: ['wrangler@3.x.x']
+      },
+      warnings: [],
+      validation: { config_valid: true, build_successful: true }
+    }
   }
 }
 ```

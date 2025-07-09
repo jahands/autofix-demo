@@ -45,6 +45,7 @@ npx autofix-cli pages-to-workers --framework <framework> [options]
 ### Arguments and Options
 
 - `--framework <framework>`: Required. One of `astro-ssg`, `astro-ssr`, `remix`, `svelte`
+- `--pages-output-dir <dir>`: Optional. Specify Pages output directory when no wrangler config exists
 - `--force`: Optional. Force migration even if multiple frameworks are detected
 - `--dry-run`: Optional. Preview changes without modifying files
 - `--verbose`: Optional. Enable detailed logging

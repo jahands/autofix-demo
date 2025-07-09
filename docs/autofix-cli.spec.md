@@ -270,16 +270,16 @@ class AstroSSGHandler implements FrameworkHandler {
     // 2. Add postbuild script for wrangler pages functions build
     // 3. Validate configuration against JSON schema
     // 4. Run build validation and capture results
-    
+
     return {
       success: true,
       changes: {
         files_created: ['wrangler.jsonc'],
         files_modified: ['package.json'],
-        dependencies_updated: ['wrangler@3.x.x']
+        dependencies_updated: ['wrangler@4.x.x'], // install wrangler@latest using package manager
       },
       warnings: [],
-      validation: { config_valid: true, build_successful: true }
+      validation: { config_valid: true, build_successful: true },
     }
   }
 }

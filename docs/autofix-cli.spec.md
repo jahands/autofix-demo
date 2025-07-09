@@ -33,8 +33,8 @@ apps/autofix-cli/
 │   │   └── package-manager.ts         # Package manager detection and operations
 │   ├── core/
 │   │   ├── wrangler-config.ts         # Wrangler configuration generation
-│   │   ├── validation.ts              # Configuration validation
-│   │   └── output.ts                  # Structured output formatting
+│   │   ├── config-validation.ts       # Configuration and build validation
+│   │   └── migration-output.ts        # Migration result formatting
 ```
 
 ## Command Interface

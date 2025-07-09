@@ -104,6 +104,8 @@ interface FrameworkDetection {
 - **Svelte SSG**: `@sveltejs/kit` in dependencies, `@sveltejs/adapter-static` in dependencies
 - **Svelte SSR**: `@sveltejs/kit` in dependencies, `@sveltejs/adapter-cloudflare` in dependencies
 
+*Note: The `@astrojs/cloudflare` adapter is what enables SSR on Cloudflare Pages (and Workers). Astro SSG projects don't need any adapter since they generate static files.*
+
 #### Validation Process
 
 1. Parse `package.json` dependencies

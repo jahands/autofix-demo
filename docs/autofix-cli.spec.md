@@ -22,19 +22,19 @@ apps/autofix-cli/
 │   │   └── autofix-cli.cmd.ts         # CLI entry point
 │   ├── commands/
 │   │   └── pages-to-workers.cmd.ts    # Main migration command
-│   ├── frameworks/
-│   │   ├── astro-ssg.ts               # Astro SSG handler
-│   │   ├── astro-ssr.ts               # Astro SSR handler
-│   │   ├── remix.ts                   # Remix handler
-│   │   ├── svelte-ssg.ts              # Svelte SSG handler
-│   │   └── svelte-ssr.ts              # Svelte SSR handler
-│   ├── detection/
-│   │   ├── project.ts                 # Framework detection logic
-│   │   └── package-manager.ts         # Package manager detection and operations
-│   ├── core/
+│   ├── pages/
+│   │   ├── frameworks/
+│   │   │   ├── astro-ssg.ts           # Astro SSG handler
+│   │   │   ├── astro-ssr.ts           # Astro SSR handler
+│   │   │   ├── remix.ts               # Remix handler
+│   │   │   ├── svelte-ssg.ts          # Svelte SSG handler
+│   │   │   └── svelte-ssr.ts          # Svelte SSR handler
 │   │   ├── wrangler-config.ts         # Wrangler configuration generation
 │   │   ├── config-validation.ts       # Configuration and build validation
 │   │   └── migration-output.ts        # Migration result formatting
+│   ├── core/
+│   │   ├── project.detection.ts       # Framework detection logic
+│   │   └── package-manager.detection.ts # Package manager detection and operations
 ```
 
 ## Command Interface

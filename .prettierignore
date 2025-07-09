@@ -13,3 +13,4 @@ worker-configuration.d.ts
 CLAUDE.md
 AGENT.md
 AGENTS.md
+**/prompts/**/*.md

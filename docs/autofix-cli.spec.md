@@ -10,7 +10,7 @@ The autofix-cli is a Node.js CLI tool built with Commander.js that automates the
 
 - **Commander.js**: CLI argument parsing and command structure
 - **zx**: Shell utilities for file operations and process execution
-- **Zod**: Runtime validation for configurations and inputs
+- **Zod 4**: Runtime validation for configurations and inputs
 - **TypeScript**: Type safety and development experience
 
 ### Project Structure
@@ -275,15 +275,21 @@ class AstroSSGHandler implements FrameworkHandler {
       success: true,
       changes: {
         files_created: [
-          { path: 'wrangler.jsonc', summary: 'Generated Astro SSG configuration with pages_build_output_dir set to "dist"' }
+          {
+            path: 'wrangler.jsonc',
+            summary: 'Generated Astro SSG configuration with pages_build_output_dir set to "dist"',
+          },
         ],
         files_modified: [
-          { path: 'package.json', summary: 'Added postbuild script: "wrangler pages functions build"' }
+          {
+            path: 'package.json',
+            summary: 'Added postbuild script: "wrangler pages functions build"',
+          },
         ],
-        dependencies_updated: ['wrangler@4.x.x']
+        dependencies_updated: ['wrangler@4.x.x'],
       },
       warnings: [],
-      validation: { config_valid: true, build_successful: true }
+      validation: { config_valid: true, build_successful: true },
     }
   }
 }

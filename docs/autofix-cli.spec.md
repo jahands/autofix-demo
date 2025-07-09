@@ -32,8 +32,6 @@ apps/autofix-cli/
 │   │   ├── wrangler-config.ts         # Wrangler configuration generation
 │   │   ├── validation.ts              # Configuration validation
 │   │   └── output.ts                  # Structured output formatting
-│   └── types/
-│       └── index.ts                   # Type definitions
 ```
 
 ## Command Interface

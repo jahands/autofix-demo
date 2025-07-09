@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "llm-rules"
+  ],
+  "enableAllProjectMcpServers": true
+}

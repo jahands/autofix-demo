@@ -1,0 +1,17 @@
+{
+	"mcpServers": {
+		"llm-rules": {
+			"type": "stdio",
+			"command": "bun",
+			"args": ["x", "llm-rules@latest"]
+		},
+		"context7": {
+			"type": "sse",
+			"url": "https://mcp.context7.com/sse"
+		},
+		"cloudflare-docs": {
+			"type": "sse",
+			"url": "https://docs.mcp.cloudflare.com/sse"
+		}
+	}
+}

@@ -46,6 +46,7 @@ npx autofix-cli pages-to-workers --framework <framework> [options]
 ### Arguments and Options
 
 - `--framework <framework>`: Required. One of `astro-ssg`, `astro-ssr`, `remix`, `svelte-ssg`, `svelte-ssr`
+- `--pages-build-command <command>`: Required. The build command currently used by the Pages project
 - `--pages-output-dir <dir>`: Optional. Specify Pages output directory when no wrangler config exists
 - `--force`: Optional. Force migration even if multiple frameworks are detected
 - `--dry-run`: Optional. Preview changes without modifying files
@@ -123,39 +124,25 @@ interface WranglerConfig {
 
 #### Script Modifications
 
-Framework-specific script updates:
+The CLI uses the `--pages-build-command` flag to understand the current build process and modify package.json scripts accordingly.
 
-**Astro SSG:**
+**Astro SSG (Detailed Implementation):**
 
-```json
-{
-  "scripts": {
-    "postbuild": "wrangler pages functions build"
-  }
-}
-```
+Astro SSG projects are static sites that don't require build script modifications. The CLI should:
 
-**Astro SSR:**
+1. **Generate Workers-compatible wrangler.jsonc** with appropriate static site configuration
+2. **No package.json script changes needed** - existing build process can remain unchanged
+3. **Update wrangler dependency** to latest version
 
-```json
-{
-  "scripts": {
-    "build": "astro build",
-    "deploy": "wrangler deploy"
-  }
-}
-```
+The existing build command (from `--pages-build-command`) can continue to work as-is since it's just generating static files.
 
-**Remix:**
+**Other Frameworks (General Pattern):**
 
-```json
-{
-  "scripts": {
-    "build": "remix build",
-    "deploy": "wrangler deploy"
-  }
-}
-```
+- **Astro SSR**: May need build script updates and deploy script addition
+- **Remix**: Likely needs build script normalization and deploy script
+- **Svelte SSG/SSR**: Similar to Astro pattern, depends on adapter configuration
+
+*Note: Exact implementation details for non-Astro SSG frameworks to be determined during development.*
 
 #### Dependency Updates
 

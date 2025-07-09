@@ -84,6 +84,11 @@ Once detected, the CLI uses the appropriate commands:
 - **npm**: `npm install wrangler@latest`
 - **bun**: `bun add wrangler@latest`
 
+#### Error Handling
+- **Package manager not found in PATH**: Exit with code 1 and clear error message
+- **Package manager detection fails**: Fall back to npm if available, otherwise exit with error
+- **Dependency installation fails**: Exit with code 1 and include installation output in error message
+
 ### 2. Framework Detection and Validation
 
 #### Detection Logic
@@ -111,7 +116,7 @@ interface FrameworkDetection {
 1. Parse `package.json` dependencies
 2. Run framework detection for all supported frameworks
 3. If multiple frameworks detected without `--force`:
-   - Exit with code 2
+   - Exit with code 1
    - Output detected frameworks for LLM decision
 4. If specified framework not detected:
    - Log warning but continue
@@ -180,14 +185,16 @@ The existing build command (from `--pages-build-command`) can continue to work a
 
 #### Process
 
-1. Execute build script using detected package manager (e.g., `pnpm run build`, `yarn build`, `npm run build`)
-2. Capture stdout/stderr
-3. Check exit code
-4. Include results in output summary
+1. **Execute build command** using the `--pages-build-command` flag value:
+   - If command is a package manager script (e.g., `npm run build`), execute as-is
+   - If command is a direct command (e.g., `astro build`), execute using detected package manager's run command
+2. **Capture stdout/stderr** from the build process
+3. **Check exit code** to determine if build succeeded
+4. **Include results in output summary** for LLM analysis
 
 #### Failure Handling
 
-- Build failures are non-fatal (exit code 4)
+- Build failures are non-fatal (still exit code 0 for success)
 - Include build output in summary for LLM analysis
 - Continue with other validation steps
 
@@ -200,8 +207,18 @@ The existing build command (from `--pages-build-command`) can continue to work a
   "status": "success",
   "framework": "astro-ssr",
   "changes": {
-    "files_created": ["wrangler.jsonc"],
-    "files_modified": ["package.json"],
+    "files_created": [
+      {
+        "path": "wrangler.jsonc",
+        "summary": "Generated Astro SSR configuration with main entry point"
+      }
+    ],
+    "files_modified": [
+      {
+        "path": "package.json",
+        "summary": "Added deploy script: wrangler deploy"
+      }
+    ],
     "dependencies_updated": ["wrangler@3.x.x"]
   },
   "validation": {
@@ -263,6 +280,19 @@ interface FrameworkHandler {
   async migrate(projectPath: string): Promise<MigrationResult>
 }
 
+interface Warning {
+  type: string
+  message: string
+  recommendation?: string
+  details?: string
+}
+
+interface ValidationResult {
+  config_valid: boolean
+  build_successful: boolean
+  build_output?: string
+}
+
 interface MigrationResult {
   success: boolean
   changes: {
@@ -314,7 +344,7 @@ class AstroSSGHandler implements FrameworkHandler {
 When multiple frameworks are detected:
 
 1. List all detected frameworks
-2. Exit with code 2
+2. Exit with code 1
 3. Provide clear guidance for using `--force`
 
 ### Configuration Conflicts
@@ -332,7 +362,7 @@ When build validation fails:
 1. Capture full build output
 2. Include in output summary
 3. Continue with other validation steps
-4. Use exit code 4 (non-fatal)
+4. Still use exit code 0 (non-fatal)
 
 ## Testing Strategy
 
@@ -356,7 +386,8 @@ Create minimal test projects for each framework:
 - `test/fixtures/astro-ssg/`
 - `test/fixtures/astro-ssr/`
 - `test/fixtures/remix/`
-- `test/fixtures/svelte/`
+- `test/fixtures/svelte-ssg/`
+- `test/fixtures/svelte-ssr/`
 
 ## Future Considerations
 

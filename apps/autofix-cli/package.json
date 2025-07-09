@@ -1,0 +1,55 @@
+{
+	"name": "autofix-cli",
+	"version": "0.1.0",
+	"private": false,
+	"description": "A CLI for autofixing issues, such as Cloudflare Workers compatibility issues",
+	"keywords": [
+		"autofix",
+		"ai",
+		"cloudflare",
+		"workers"
+	],
+	"homepage": "https://github.com/jahands/autofix-demo/tree/main/apps/autofix-cli",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jahands/autofix-demo.git",
+		"directory": "apps/autofix-cli"
+	},
+	"license": "MIT",
+	"author": {
+		"name": "Jacob Hands",
+		"url": "https://twitter.com/jachands"
+	},
+	"sideEffects": false,
+	"type": "module",
+	"bin": {
+		"autofix-cli": "./dist/autofix-cli.cmd.cjs"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "runx build lib ./src/bin/autofix-cli.cmd.ts --platform=node --format=cjs --sourcemap=external --no-types",
+		"build:dev": "runx build lib ./src/bin/autofix-cli.cmd.ts --platform=node --format=cjs --sourcemap=external --no-types --no-minify",
+		"check:lint": "run-eslint",
+		"check:types": "run-tsc",
+		"prepublishOnly": "rm -f dist/*.map",
+		"start": "run-s -s build:dev start:run",
+		"start:run": "node ./dist/autofix-cli.cmd.cjs",
+		"test": "run-vitest"
+	},
+	"devDependencies": {
+		"@commander-js/extra-typings": "14.0.0",
+		"@jahands/cli-tools": "0.10.12",
+		"@repo/eslint-config": "workspace:*",
+		"@repo/tools": "workspace:*",
+		"@repo/typescript-config": "workspace:*",
+		"commander": "14.0.0",
+		"vitest": "3.2.4",
+		"zod": "3.25.76",
+		"zx": "8.6.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

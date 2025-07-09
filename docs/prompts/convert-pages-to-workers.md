@@ -7,11 +7,11 @@ Convert a Cloudflare Pages project to Workers using autofix-cli.
 1. **Analyze the project** to determine framework type and build command
 2. **Run with dry-run** to preview changes:
    ```bash
-   npx autofix-cli pages-to-workers --framework <type> --pages-build-command "<command>" --dry-run
+   npx autofix-cli@latest pages-to-workers --framework <type> --pages-build-command "<command>" --dry-run
    ```
 3. **Execute the conversion**:
    ```bash
-   npx autofix-cli pages-to-workers --framework <type> --pages-build-command "<command>"
+   npx autofix-cli@latest pages-to-workers --framework <type> --pages-build-command "<command>"
    ```
 
 ## Framework Types

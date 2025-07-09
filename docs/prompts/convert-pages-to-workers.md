@@ -47,9 +47,6 @@ npx autofix-cli pages-to-workers --framework <type> --pages-build-command "<comm
 
 ## Common Issues
 
-**Multiple frameworks detected?**
-- Use `--force` flag if you're sure about the framework
-
 **Build command unclear?**
 - Check the `scripts` section in `package.json`
 - Look for `build`, `build:production`, or similar

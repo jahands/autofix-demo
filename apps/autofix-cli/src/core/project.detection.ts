@@ -24,8 +24,8 @@ export class ProjectDetector {
 	async detectFrameworks(projectPath: string): Promise<FrameworkDetection[]> {
 		const packageJson = await this.readPackageJson(projectPath)
 		const allDeps = {
-			...packageJson.dependencies,
-			...packageJson.devDependencies,
+			...(packageJson.dependencies || {}),
+			...(packageJson.devDependencies || {}),
 		}
 
 		const detections: FrameworkDetection[] = []
@@ -48,7 +48,7 @@ export class ProjectDetector {
 		}
 
 		// Detect Remix
-		if (Object.keys(allDeps).some(dep => dep.startsWith('@remix-run/'))) {
+		if (Object.keys(allDeps || {}).some(dep => dep.startsWith('@remix-run/'))) {
 			detections.push({
 				framework: 'remix',
 				confidence: 'high',
@@ -90,24 +90,31 @@ export class ProjectDetector {
 		valid: boolean
 		warnings: string[]
 	}> {
-		const detections = await this.detectFrameworks(projectPath)
-		const detected = detections.find(d => d.framework === framework)
+		try {
+			const detections = await this.detectFrameworks(projectPath)
+			const detected = detections.find(d => d.framework === framework)
 
-		if (!detected) {
+			if (!detected) {
+				return {
+					valid: false,
+					warnings: [
+						`${framework} dependencies not found in package.json`,
+						`Detected frameworks: ${detections.map(d => d.framework).join(', ')}`,
+					],
+				}
+			}
+
+			return {
+				valid: true,
+				warnings: detected.confidence === 'low' ? [
+					`${framework} detected with low confidence`,
+				] : [],
+			}
+		} catch (error: any) {
 			return {
 				valid: false,
-				warnings: [
-					`${framework} dependencies not found in package.json`,
-					`Detected frameworks: ${detections.map(d => d.framework).join(', ')}`,
-				],
+				warnings: [`Error validating framework: ${error.message}`],
 			}
-		}
-
-		return {
-			valid: true,
-			warnings: detected.confidence === 'low' ? [
-				`${framework} detected with low confidence`,
-			] : [],
 		}
 	}
 

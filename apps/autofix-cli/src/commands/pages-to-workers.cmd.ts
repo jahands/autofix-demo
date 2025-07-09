@@ -75,13 +75,20 @@ export function createPagesToWorkersCommand(): Command {
 
 				// Execute migration
 				const handler = new AstroSSGHandler()
-				const result = await handler.migrate(projectPath, validatedOptions.pagesBuildCommand)
+				const result = await handler.migrate(projectPath, validatedOptions.pagesBuildCommand, validatedOptions.dryRun)
 
 				if (result.success) {
 					const successOutput = formatter.formatSuccess(validatedOptions.framework, result)
 					console.log(JSON.stringify(successOutput, null, 2))
 					process.exit(0)
 				} else {
+					// Show detailed error information for failed migrations
+					if (validatedOptions.verbose) {
+						console.error('Migration failed with details:')
+						console.error('Warnings:', result.warnings)
+						console.error('Validation:', result.validation)
+					}
+					
 					const errorOutput = formatter.formatError(
 						'migration_failed',
 						'Migration failed',

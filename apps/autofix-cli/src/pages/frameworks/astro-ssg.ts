@@ -17,7 +17,7 @@ export class AstroSSGHandler implements FrameworkHandler {
 	private packageManagerDetector = new PackageManagerDetector()
 	private projectDetector = new ProjectDetector()
 
-	async migrate(projectPath: string, buildCommand: string): Promise<MigrationResult> {
+	async migrate(projectPath: string, buildCommand: string, isDryRun: boolean = false): Promise<MigrationResult> {
 		const warnings: Warning[] = []
 		const filesCreated: FileChange[] = []
 		const filesModified: FileChange[] = []
@@ -25,13 +25,25 @@ export class AstroSSGHandler implements FrameworkHandler {
 
 		try {
 			// 1. Detect package manager
-			const packageManagerResult = await this.packageManagerDetector.detect(projectPath)
+			let packageManagerResult
+			try {
+				packageManagerResult = await this.packageManagerDetector.detect(projectPath)
+			} catch (error: any) {
+				throw new Error(`Package manager detection failed: ${error.message}`)
+			}
+			
 			if (!packageManagerResult.available) {
 				throw new Error(`Package manager ${packageManagerResult.manager} not found in PATH`)
 			}
 
 			// 2. Validate framework
-			const frameworkValidation = await this.projectDetector.validateFramework(projectPath, 'astro-ssg')
+			let frameworkValidation
+			try {
+				frameworkValidation = await this.projectDetector.validateFramework(projectPath, 'astro-ssg')
+			} catch (error: any) {
+				throw new Error(`Framework validation failed: ${error.message}`)
+			}
+			
 			if (!frameworkValidation.valid) {
 				warnings.push({
 					type: 'framework_mismatch',
@@ -42,18 +54,23 @@ export class AstroSSGHandler implements FrameworkHandler {
 			}
 
 			// 3. Update wrangler dependency
-			const wranglerResult = await this.packageManagerDetector.installWrangler(
-				projectPath,
-				packageManagerResult.manager
-			)
-			if (!wranglerResult.success) {
-				throw new Error(`Failed to install wrangler: ${wranglerResult.output}`)
-			}
+			if (!isDryRun) {
+				const wranglerResult = await this.packageManagerDetector.installWrangler(
+					projectPath,
+					packageManagerResult.manager
+				)
+				if (!wranglerResult.success) {
+					throw new Error(`Failed to install wrangler: ${wranglerResult.output}`)
+				}
 
-			const versionString = wranglerResult.version 
-				? `wrangler@${wranglerResult.version} (using ${packageManagerResult.manager})`
-				: `wrangler@latest (using ${packageManagerResult.manager})`
-			dependenciesUpdated.push(versionString)
+				const versionString = wranglerResult.version 
+					? `wrangler@${wranglerResult.version} (using ${packageManagerResult.manager})`
+					: `wrangler@latest (using ${packageManagerResult.manager})`
+				dependenciesUpdated.push(versionString)
+			} else {
+				// Dry run - simulate dependency update
+				dependenciesUpdated.push(`wrangler@latest (using ${packageManagerResult.manager}) [DRY RUN]`)
+			}
 
 			// 4. Generate wrangler.jsonc
 			const wranglerConfig = await this.generateWranglerConfig(projectPath)
@@ -65,28 +82,38 @@ export class AstroSSGHandler implements FrameworkHandler {
 				await access(wranglerConfigPath, constants.F_OK)
 				configExists = true
 				
-				// Backup existing config
-				await $`cd ${projectPath} && cp wrangler.jsonc wrangler.jsonc.backup`
-				warnings.push({
-					type: 'config_backup',
-					message: 'Existing wrangler.jsonc backed up',
-					details: 'Backup saved as wrangler.jsonc.backup',
-				})
+				if (!isDryRun) {
+					// Backup existing config
+					await $`cd ${projectPath} && cp wrangler.jsonc wrangler.jsonc.backup`
+					warnings.push({
+						type: 'config_backup',
+						message: 'Existing wrangler.jsonc backed up',
+						details: 'Backup saved as wrangler.jsonc.backup',
+					})
+				} else {
+					warnings.push({
+						type: 'config_backup',
+						message: 'Existing wrangler.jsonc would be backed up',
+						details: 'Backup would be saved as wrangler.jsonc.backup [DRY RUN]',
+					})
+				}
 			} catch {
 				// Config doesn't exist, which is fine
 			}
 
-			await writeFile(wranglerConfigPath, JSON.stringify(wranglerConfig, null, 2))
+			if (!isDryRun) {
+				await writeFile(wranglerConfigPath, JSON.stringify(wranglerConfig, null, 2))
+			}
 			
 			if (configExists) {
 				filesModified.push({
 					path: 'wrangler.jsonc',
-					summary: 'Updated Astro SSG configuration with pages_build_output_dir set to "dist"',
+					summary: `Updated Astro SSG configuration with pages_build_output_dir set to "dist"${isDryRun ? ' [DRY RUN]' : ''}`,
 				})
 			} else {
 				filesCreated.push({
 					path: 'wrangler.jsonc',
-					summary: 'Generated Astro SSG configuration with pages_build_output_dir set to "dist"',
+					summary: `Generated Astro SSG configuration with pages_build_output_dir set to "dist"${isDryRun ? ' [DRY RUN]' : ''}`,
 				})
 			}
 
@@ -101,7 +128,9 @@ export class AstroSSGHandler implements FrameworkHandler {
 			}
 
 			// 6. Run build validation
-			const buildResult = await this.validateBuild(projectPath, buildCommand)
+			const buildResult = isDryRun 
+				? { success: true, output: 'Build validation skipped in dry run' }
+				: await this.validateBuild(projectPath, buildCommand)
 
 			return {
 				success: true,
@@ -162,7 +191,7 @@ export class AstroSSGHandler implements FrameworkHandler {
 			const packageJsonPath = join(projectPath, 'package.json')
 			const content = await readFile(packageJsonPath, 'utf-8')
 			const packageJson = JSON.parse(content)
-			return packageJson.name || 'my-astro-app'
+			return packageJson?.name || 'my-astro-app'
 		} catch {
 			return 'my-astro-app'
 		}

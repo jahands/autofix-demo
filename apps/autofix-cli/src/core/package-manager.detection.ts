@@ -18,6 +18,7 @@ export class PackageManagerDetector {
 		'yarn.lock': 'yarn' as const,
 		'package-lock.json': 'npm' as const,
 		'bun.lockb': 'bun' as const,
+		'bun.lock': 'bun' as const,
 	}
 
 	/**
@@ -25,7 +26,7 @@ export class PackageManagerDetector {
 	 */
 	async detect(projectPath: string): Promise<PackageManagerDetectionResult> {
 		// Check for lock files
-		for (const [lockFile, manager] of Object.entries(this.LOCK_FILE_MAP)) {
+		for (const [lockFile, manager] of Object.entries(PackageManagerDetector.LOCK_FILE_MAP)) {
 			const lockPath = join(projectPath, lockFile)
 			try {
 				await access(lockPath, constants.F_OK)
@@ -68,15 +69,19 @@ export class PackageManagerDetector {
 		output: string
 		version?: string
 	}> {
-		const commands = {
-			pnpm: 'pnpm add wrangler@latest',
-			yarn: 'yarn add wrangler@latest',
-			npm: 'npm install wrangler@latest',
-			bun: 'bun add wrangler@latest',
-		}
-
 		try {
-			const result = await $`cd ${projectPath} && ${commands[manager]}`
+			let result
+			if (manager === 'pnpm') {
+				result = await $`cd ${projectPath} && pnpm add wrangler@latest`
+			} else if (manager === 'yarn') {
+				result = await $`cd ${projectPath} && yarn add wrangler@latest`
+			} else if (manager === 'npm') {
+				result = await $`cd ${projectPath} && npm install wrangler@latest`
+			} else if (manager === 'bun') {
+				result = await $`cd ${projectPath} && bun add wrangler@latest`
+			} else {
+				throw new Error(`Unknown package manager: ${manager}`)
+			}
 			const output = result.stdout + result.stderr
 			
 			// Try to get the installed version

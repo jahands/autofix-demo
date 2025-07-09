@@ -55,13 +55,17 @@ importers:
         version: 3.2.4(@types/node@22.15.27)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.20.3)(yaml@2.8.0)
 
   apps/autofix-cli:
+    dependencies:
+      zod:
+        specifier: 3.25.0-beta.20250519T094321
+        version: 3.25.0-beta.20250519T094321
     devDependencies:
       '@commander-js/extra-typings':
         specifier: 14.0.0
         version: 14.0.0(commander@14.0.0)
       '@jahands/cli-tools':
         specifier: 0.10.12
-        version: 0.10.12(@commander-js/extra-typings@14.0.0(commander@14.0.0))(commander@14.0.0)(typescript@5.8.3)(zod@3.25.76)(zx@8.6.2)
+        version: 0.10.12(@commander-js/extra-typings@14.0.0(commander@14.0.0))(commander@14.0.0)(typescript@5.8.3)(zod@3.25.0-beta.20250519T094321)(zx@8.6.2)
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
@@ -77,9 +81,6 @@ importers:
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/node@22.15.27)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.20.3)(yaml@2.8.0)
-      zod:
-        specifier: 3.25.76
-        version: 3.25.76
       zx:
         specifier: 8.6.2
         version: 8.6.2
@@ -4142,6 +4143,9 @@ packages:
   zod@3.22.3:
     resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
 
+  zod@3.25.0-beta.20250519T094321:
+    resolution: {integrity: sha512-FvDMTcBUhM/CZjeT0HJQ8M6KbSGRPHqEx2yLWx9kDU3ufoTiq7tQAI8UyBJ/82CBp1mv6tKVWp00ll6zV/WxmA==}
+
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
@@ -4736,6 +4740,14 @@ snapshots:
 
   '@img/sharp-win32-x64@0.33.5':
     optional: true
+
+  '@jahands/cli-tools@0.10.12(@commander-js/extra-typings@14.0.0(commander@14.0.0))(commander@14.0.0)(typescript@5.8.3)(zod@3.25.0-beta.20250519T094321)(zx@8.6.2)':
+    dependencies:
+      '@commander-js/extra-typings': 14.0.0(commander@14.0.0)
+      commander: 14.0.0
+      typescript: 5.8.3
+      zod: 3.25.0-beta.20250519T094321
+      zx: 8.6.2
 
   '@jahands/cli-tools@0.10.12(@commander-js/extra-typings@14.0.0(commander@14.0.0))(commander@14.0.0)(typescript@5.8.3)(zod@3.25.76)(zx@8.6.2)':
     dependencies:
@@ -8451,6 +8463,8 @@ snapshots:
       stacktracey: 2.1.8
 
   zod@3.22.3: {}
+
+  zod@3.25.0-beta.20250519T094321: {}
 
   zod@3.25.76: {}
 

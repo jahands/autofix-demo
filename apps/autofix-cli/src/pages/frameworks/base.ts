@@ -34,5 +34,5 @@ export const MigrationResult = z.object({
 })
 
 export interface FrameworkHandler {
-	migrate(projectPath: string, buildCommand: string): Promise<MigrationResult>
+	migrate(projectPath: string, buildCommand: string, isDryRun?: boolean): Promise<MigrationResult>
 }

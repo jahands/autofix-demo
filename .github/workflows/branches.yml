@@ -12,7 +12,6 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    concurrency: ${{ github.workflow }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4

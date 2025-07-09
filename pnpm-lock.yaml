@@ -29,6 +29,9 @@ importers:
       '@turbo/gen':
         specifier: 2.5.4
         version: 2.5.4(@types/node@22.15.27)(typescript@5.8.2)
+      autofix-cli:
+        specifier: workspace:*
+        version: link:apps/autofix-cli
       npm-run-all2:
         specifier: 8.0.4
         version: 8.0.4

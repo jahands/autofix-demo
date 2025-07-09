@@ -22,23 +22,20 @@
 	},
 	"sideEffects": false,
 	"type": "module",
-	"exports": {
-		".": "./dist/autofix-cli.cjs",
-		"./cli": "./src/bin/autofix-cli.ts"
+	"bin": {
+		"autofix-cli": "./dist/autofix-cli.cmd.cjs"
 	},
-	"main": "./dist/autofix-cli.cjs",
-	"bin": "./dist/autofix-cli.cjs",
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "runx build lib ./src/bin/autofix-cli.ts --platform=node --format=cjs --sourcemap=external --no-types",
-		"build:dev": "runx build lib ./src/bin/autofix-cli.ts --platform=node --format=cjs --sourcemap=external --no-types --no-minify",
+		"build": "runx build lib ./src/bin/autofix-cli.cmd.ts --platform=node --format=cjs --sourcemap=external --no-types",
+		"build:dev": "runx build lib ./src/bin/autofix-cli.cmd.ts --platform=node --format=cjs --sourcemap=external --no-types --no-minify",
 		"check:lint": "run-eslint",
 		"check:types": "run-tsc",
 		"prepublishOnly": "rm -f dist/*.map",
 		"start": "run-s -s build:dev start:run",
-		"start:run": "node ./dist/autofix-cli.cjs",
+		"start:run": "node ./dist/autofix-cli.cmd.cjs",
 		"test": "run-vitest"
 	},
 	"devDependencies": {

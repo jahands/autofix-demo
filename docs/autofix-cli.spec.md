@@ -53,10 +53,7 @@ npx autofix-cli pages-to-workers --framework <framework> [options]
 ### Exit Codes
 
 - `0`: Success
-- `1`: General error
-- `2`: Framework validation error (multiple frameworks detected)
-- `3`: Configuration validation error
-- `4`: Build validation failed (non-fatal)
+- `1`: Error (see stdout for detailed information)
 
 ## Core Functionality
 

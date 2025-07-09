@@ -252,8 +252,8 @@ interface FrameworkHandler {
 interface MigrationResult {
   success: boolean
   changes: {
-    files_created: string[]
-    files_modified: string[]
+    files_created: Array<{ path: string; summary: string }>
+    files_modified: Array<{ path: string; summary: string }>
     dependencies_updated: string[]
   }
   warnings: Warning[]
@@ -274,12 +274,16 @@ class AstroSSGHandler implements FrameworkHandler {
     return {
       success: true,
       changes: {
-        files_created: ['wrangler.jsonc'],
-        files_modified: ['package.json'],
-        dependencies_updated: ['wrangler@4.x.x'], // install wrangler@latest using package manager
+        files_created: [
+          { path: 'wrangler.jsonc', summary: 'Generated Astro SSG configuration with pages_build_output_dir set to "dist"' }
+        ],
+        files_modified: [
+          { path: 'package.json', summary: 'Added postbuild script: "wrangler pages functions build"' }
+        ],
+        dependencies_updated: ['wrangler@4.x.x']
       },
       warnings: [],
-      validation: { config_valid: true, build_successful: true },
+      validation: { config_valid: true, build_successful: true }
     }
   }
 }

@@ -1,6 +1,6 @@
-import { z } from 'zod'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import { z } from 'zod'
 
 export type Framework = z.infer<typeof Framework>
 export const Framework = z.enum(['astro-ssg', 'astro-ssr', 'remix', 'svelte-ssg', 'svelte-ssr'])
@@ -48,7 +48,7 @@ export class ProjectDetector {
 		}
 
 		// Detect Remix
-		if (Object.keys(allDeps || {}).some(dep => dep.startsWith('@remix-run/'))) {
+		if (Object.keys(allDeps || {}).some((dep) => dep.startsWith('@remix-run/'))) {
 			detections.push({
 				framework: 'remix',
 				confidence: 'high',
@@ -86,29 +86,31 @@ export class ProjectDetector {
 	/**
 	 * Validate that the specified framework matches the project
 	 */
-	async validateFramework(projectPath: string, framework: Framework): Promise<{
+	async validateFramework(
+		projectPath: string,
+		framework: Framework
+	): Promise<{
 		valid: boolean
 		warnings: string[]
 	}> {
 		try {
 			const detections = await this.detectFrameworks(projectPath)
-			const detected = detections.find(d => d.framework === framework)
+			const detected = detections.find((d) => d.framework === framework)
 
 			if (!detected) {
 				return {
 					valid: false,
 					warnings: [
 						`${framework} dependencies not found in package.json`,
-						`Detected frameworks: ${detections.map(d => d.framework).join(', ')}`,
+						`Detected frameworks: ${detections.map((d) => d.framework).join(', ')}`,
 					],
 				}
 			}
 
 			return {
 				valid: true,
-				warnings: detected.confidence === 'low' ? [
-					`${framework} detected with low confidence`,
-				] : [],
+				warnings:
+					detected.confidence === 'low' ? [`${framework} detected with low confidence`] : [],
 			}
 		} catch (error: any) {
 			return {

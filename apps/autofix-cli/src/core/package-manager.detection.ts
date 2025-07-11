@@ -1,6 +1,6 @@
-import { z } from 'zod'
 import { access, constants } from 'fs/promises'
 import { join } from 'path'
+import { z } from 'zod'
 import { $ } from 'zx'
 
 export type PackageManager = z.infer<typeof PackageManager>
@@ -64,7 +64,10 @@ export class PackageManagerDetector {
 	/**
 	 * Install wrangler using the detected package manager
 	 */
-	async installWrangler(projectPath: string, manager: PackageManager): Promise<{
+	async installWrangler(
+		projectPath: string,
+		manager: PackageManager
+	): Promise<{
 		success: boolean
 		output: string
 		version?: string
@@ -83,7 +86,7 @@ export class PackageManagerDetector {
 				throw new Error(`Unknown package manager: ${manager}`)
 			}
 			const output = result.stdout + result.stderr
-			
+
 			// Try to get the installed version
 			let version: string | undefined
 			try {

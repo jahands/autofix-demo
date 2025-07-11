@@ -38,6 +38,9 @@
 		"start:run": "node ./dist/autofix-cli.cmd.cjs",
 		"test": "run-vitest"
 	},
+	"dependencies": {
+		"zod": "3.25.0-beta.20250519T094321"
+	},
 	"devDependencies": {
 		"@commander-js/extra-typings": "14.0.0",
 		"@jahands/cli-tools": "0.10.12",
@@ -50,8 +53,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"dependencies": {
-		"zod": "3.25.0-beta.20250519T094321"
 	}
 }

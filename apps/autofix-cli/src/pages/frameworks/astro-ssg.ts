@@ -1,10 +1,12 @@
-import { z } from 'zod'
-import { writeFile, readFile, access, constants } from 'fs/promises'
+import { access, constants, readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
+import { z } from 'zod'
 import { $ } from 'zx'
+
 import { PackageManagerDetector } from '../../core/package-manager.detection.js'
 import { ProjectDetector } from '../../core/project.detection.js'
-import { FrameworkHandler, MigrationResult, Warning, FileChange } from './base.js'
+
+import type { FileChange, FrameworkHandler, MigrationResult, Warning } from './base.js'
 
 export type WranglerConfig = z.infer<typeof WranglerConfig>
 export const WranglerConfig = z.object({
@@ -19,7 +21,11 @@ export class AstroSSGHandler implements FrameworkHandler {
 	private packageManagerDetector = new PackageManagerDetector()
 	private projectDetector = new ProjectDetector()
 
-	async migrate(projectPath: string, buildCommand: string, isDryRun: boolean = false): Promise<MigrationResult> {
+	async migrate(
+		projectPath: string,
+		buildCommand: string,
+		isDryRun: boolean = false
+	): Promise<MigrationResult> {
 		const warnings: Warning[] = []
 		const filesCreated: FileChange[] = []
 		const filesModified: FileChange[] = []
@@ -33,7 +39,7 @@ export class AstroSSGHandler implements FrameworkHandler {
 			} catch (error: any) {
 				throw new Error(`Package manager detection failed: ${error.message}`)
 			}
-			
+
 			if (!packageManagerResult.available) {
 				throw new Error(`Package manager ${packageManagerResult.manager} not found in PATH`)
 			}
@@ -45,7 +51,7 @@ export class AstroSSGHandler implements FrameworkHandler {
 			} catch (error: any) {
 				throw new Error(`Framework validation failed: ${error.message}`)
 			}
-			
+
 			if (!frameworkValidation.valid) {
 				warnings.push({
 					type: 'framework_mismatch',
@@ -65,25 +71,27 @@ export class AstroSSGHandler implements FrameworkHandler {
 					throw new Error(`Failed to install wrangler: ${wranglerResult.output}`)
 				}
 
-				const versionString = wranglerResult.version 
+				const versionString = wranglerResult.version
 					? `wrangler@${wranglerResult.version} (using ${packageManagerResult.manager})`
 					: `wrangler@latest (using ${packageManagerResult.manager})`
 				dependenciesUpdated.push(versionString)
 			} else {
 				// Dry run - simulate dependency update
-				dependenciesUpdated.push(`wrangler@latest (using ${packageManagerResult.manager}) [DRY RUN]`)
+				dependenciesUpdated.push(
+					`wrangler@latest (using ${packageManagerResult.manager}) [DRY RUN]`
+				)
 			}
 
 			// 4. Generate wrangler.jsonc
 			const wranglerConfig = await this.generateWranglerConfig(projectPath)
 			const wranglerConfigPath = join(projectPath, 'wrangler.jsonc')
-			
+
 			// Check if wrangler config already exists
 			let configExists = false
 			try {
 				await access(wranglerConfigPath, constants.F_OK)
 				configExists = true
-				
+
 				if (!isDryRun) {
 					// Backup existing config
 					await $`cd ${projectPath} && cp wrangler.jsonc wrangler.jsonc.backup`
@@ -106,7 +114,7 @@ export class AstroSSGHandler implements FrameworkHandler {
 			if (!isDryRun) {
 				await writeFile(wranglerConfigPath, JSON.stringify(wranglerConfig, null, 2))
 			}
-			
+
 			if (configExists) {
 				filesModified.push({
 					path: 'wrangler.jsonc',
@@ -130,7 +138,7 @@ export class AstroSSGHandler implements FrameworkHandler {
 			}
 
 			// 6. Run build validation
-			const buildResult = isDryRun 
+			const buildResult = isDryRun
 				? { success: true, output: 'Build validation skipped in dry run' }
 				: await this.validateBuild(projectPath, buildCommand)
 
@@ -157,11 +165,13 @@ export class AstroSSGHandler implements FrameworkHandler {
 					files_modified: filesModified,
 					dependencies_updated: dependenciesUpdated,
 				},
-				warnings: [{
-					type: 'migration_error',
-					message: error.message,
-					recommendation: 'Check error details and try again',
-				}],
+				warnings: [
+					{
+						type: 'migration_error',
+						message: error.message,
+						recommendation: 'Check error details and try again',
+					},
+				],
 				validation: {
 					config_valid: false,
 					build_successful: false,
@@ -177,7 +187,7 @@ export class AstroSSGHandler implements FrameworkHandler {
 	private async generateWranglerConfig(projectPath: string): Promise<WranglerConfig> {
 		// Get project name from package.json
 		const projectName = await this.getProjectName(projectPath)
-		
+
 		return {
 			name: projectName,
 			compatibility_date: new Date().toISOString().split('T')[0],
@@ -216,7 +226,10 @@ export class AstroSSGHandler implements FrameworkHandler {
 	/**
 	 * Run build validation
 	 */
-	private async validateBuild(projectPath: string, buildCommand: string): Promise<{
+	private async validateBuild(
+		projectPath: string,
+		buildCommand: string
+	): Promise<{
 		success: boolean
 		output: string
 	}> {

@@ -14,3 +14,4 @@ CLAUDE.md
 AGENT.md
 AGENTS.md
 **/prompts/**/*.md
+**/test/fixtures/**

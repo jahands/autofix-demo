@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { Framework } from '../core/project.detection.js'
 import { MigrationResult } from './frameworks/base.js'
 
@@ -7,14 +8,18 @@ export const SuccessOutput = z.object({
 	status: z.literal('success'),
 	framework: Framework,
 	changes: z.object({
-		files_created: z.array(z.object({
-			path: z.string(),
-			summary: z.string(),
-		})),
-		files_modified: z.array(z.object({
-			path: z.string(),
-			summary: z.string(),
-		})),
+		files_created: z.array(
+			z.object({
+				path: z.string(),
+				summary: z.string(),
+			})
+		),
+		files_modified: z.array(
+			z.object({
+				path: z.string(),
+				summary: z.string(),
+			})
+		),
 		dependencies_updated: z.array(z.string()),
 	}),
 	validation: z.object({
@@ -22,12 +27,14 @@ export const SuccessOutput = z.object({
 		build_successful: z.boolean(),
 		build_output: z.string().optional(),
 	}),
-	warnings: z.array(z.object({
-		type: z.string(),
-		message: z.string(),
-		recommendation: z.string().optional(),
-		details: z.string().optional(),
-	})),
+	warnings: z.array(
+		z.object({
+			type: z.string(),
+			message: z.string(),
+			recommendation: z.string().optional(),
+			details: z.string().optional(),
+		})
+	),
 	summary: z.string(),
 })
 
@@ -48,7 +55,7 @@ export class MigrationOutputFormatter {
 	 */
 	formatSuccess(framework: Framework, result: MigrationResult): SuccessOutput {
 		const summary = this.generateSummary(framework, result)
-		
+
 		return {
 			status: 'success',
 			framework,
@@ -62,10 +69,14 @@ export class MigrationOutputFormatter {
 	/**
 	 * Format error output
 	 */
-	formatError(type: string, message: string, options?: {
-		detectedFrameworks?: Framework[]
-		recommendation?: string
-	}): ErrorOutput {
+	formatError(
+		type: string,
+		message: string,
+		options?: {
+			detectedFrameworks?: Framework[]
+			recommendation?: string
+		}
+	): ErrorOutput {
 		return {
 			status: 'error',
 			error_type: type,
@@ -80,22 +91,22 @@ export class MigrationOutputFormatter {
 	 */
 	private generateSummary(framework: Framework, result: MigrationResult): string {
 		const actions = []
-		
+
 		if (result.changes.files_created.length > 0) {
 			actions.push(`created ${result.changes.files_created.length} file(s)`)
 		}
-		
+
 		if (result.changes.files_modified.length > 0) {
 			actions.push(`modified ${result.changes.files_modified.length} file(s)`)
 		}
-		
+
 		if (result.changes.dependencies_updated.length > 0) {
 			actions.push(`updated ${result.changes.dependencies_updated.length} dependency(ies)`)
 		}
 
 		const buildStatus = result.validation.build_successful ? 'build passed' : 'build failed'
 		const configStatus = result.validation.config_valid ? 'config valid' : 'config issues'
-		
+
 		return `Successfully migrated ${framework} project to Workers: ${actions.join(', ')} (${buildStatus}, ${configStatus})`
 	}
 }

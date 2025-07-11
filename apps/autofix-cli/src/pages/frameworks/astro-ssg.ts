@@ -10,7 +10,9 @@ export type WranglerConfig = z.infer<typeof WranglerConfig>
 export const WranglerConfig = z.object({
 	name: z.string(),
 	compatibility_date: z.string(),
-	pages_build_output_dir: z.string(),
+	assets: z.object({
+		directory: z.string(),
+	}),
 })
 
 export class AstroSSGHandler implements FrameworkHandler {
@@ -108,12 +110,12 @@ export class AstroSSGHandler implements FrameworkHandler {
 			if (configExists) {
 				filesModified.push({
 					path: 'wrangler.jsonc',
-					summary: `Updated Astro SSG configuration with pages_build_output_dir set to "dist"${isDryRun ? ' [DRY RUN]' : ''}`,
+					summary: `Updated Workers configuration with assets directory set to "./dist"${isDryRun ? ' [DRY RUN]' : ''}`,
 				})
 			} else {
 				filesCreated.push({
 					path: 'wrangler.jsonc',
-					summary: `Generated Astro SSG configuration with pages_build_output_dir set to "dist"${isDryRun ? ' [DRY RUN]' : ''}`,
+					summary: `Generated Workers configuration with assets directory set to "./dist"${isDryRun ? ' [DRY RUN]' : ''}`,
 				})
 			}
 
@@ -179,7 +181,9 @@ export class AstroSSGHandler implements FrameworkHandler {
 		return {
 			name: projectName,
 			compatibility_date: new Date().toISOString().split('T')[0],
-			pages_build_output_dir: 'dist',
+			assets: {
+				directory: './dist',
+			},
 		}
 	}
 
